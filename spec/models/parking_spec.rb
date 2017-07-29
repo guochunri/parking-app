@@ -110,7 +110,45 @@ RSpec.describe Parking, type: :model do
        expect( @parking.amount ).to eq(300)
      end
 
-       end
+    end
+       context "long-term" do
+
+        before do
+          # 把每个测试都会用到的 @user 和 @parking 提取出来
+          @user = User.create( :email => "test@example.com", :password => "123455678")
+          @parking = Parking.new( :parking_type => "long-term", :user => @user, :start_at => @time )
+        end
+
+         it "1 mins should be ¥12" do
+          @parking.end_at = @time + 1.minutes
+          @parking.calculate_amount
+          expect(@parking.amount).to eq(1200)
+         end
+
+         it "360 mins should be ¥12" do
+          @parking.end_at = @time + 360.minutes
+          @parking.calculate_amount
+          expect( @parking.amount ).to eq(1200)
+         end
+
+         it "361 mins should be ¥16" do
+          @parking.end_at = @time + 361.minutes
+          @parking.calculate_amount
+          expect( @parking.amount ).to eq(1600)
+         end
+
+         it "1440 mins should be ¥16" do
+          @parking.end_at = @time + 1440.minutes
+          @parking.calculate_amount
+          expect( @parking.amount ).to eq(1600)
+         end
+
+         it "1441 mins should be ¥32" do
+          @parking.end_at = @time + 1441.minutes
+          @parking.calculate_amount
+          expect( @parking.amount ).to eq(3200)
+        end
   end
 
+end
 end
